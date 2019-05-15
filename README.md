@@ -11,7 +11,7 @@ Can also be used as a python module
 
 ```
 $ getbob --help
-usage: __init__.py [-h] [--output OUTPUT] [--version [VERSION]] [--force]
+usage: getbob [-h] [--output OUTPUT] [--version [VERSION]] [--force]
                    [--verbose]
 
 Arguments:

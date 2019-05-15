@@ -6,7 +6,7 @@ import argparse
 from html.parser import HTMLParser
 
 stable_url = "http://d.defold.com/stable/"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 def log(string, verbose=False):
     if verbose:
@@ -51,42 +51,42 @@ def _get_latest_stable():
     return info["sha1"], info["version"]
 
 
-def download(version, output, verbose=False):
+def download(version, output, verbose=False, overwrite=False):
+    sha = version
+
     if not output:
         print("Output file required")
     elif not version:
         sha, version = _get_latest_beta_sha()
         log("Getting latest stable version: {}".format(version), verbose)
-        _download(sha, output, verbose=verbose)
 
     elif len(version.split(".")) == 3:
         version_map = _get_version_map()
         try:
             sha = version_map[version]
-            _download(sha, output, verbose=verbose)
-            return os.path.exists(output)
         except KeyError:
             print("Can't find version {} of bob, supply valid version".format(version))
-
+            return False
     elif version == "beta":
         sha, version = _get_latest_beta_sha()
         log("Getting latest beta version: {}".format(version), verbose)
-        _download(sha, output, verbose=verbose)
 
-    else:
-        _download(version, output, verbose=verbose)
+    return _download(sha, output, verbose, overwrite)
 
 
-def _download(sha, output, verbose=False):
+def _download(sha, output, verbose=False, overwrite=False):
     bob_url = "http://d.defold.com/archive/{}/bob/bob.jar".format(sha)
     if requests.head(bob_url).status_code > 400:
         log("Can't find version {} of bob, supply valid version".format(sha), verbose)
         sys.exit(1)
 
     target_folder = os.path.dirname(output)
-    if os.path.exists(output):
+    if overwrite and os.path.exists(output):
         log("Overwriting file: {}".format(output), verbose)
         os.remove(output)
+    elif not overwrite:
+        log("Bob already downloaded: {}".format(output), verbose)
+        return False
 
     if not os.path.exists(target_folder):
         log("Creating directories: {}".format(target_folder), verbose)
@@ -110,6 +110,7 @@ def _download(sha, output, verbose=False):
         else:
             f.write(r.content)
         log("Download completed", verbose)
+    return True
 
 def _cli_options():
     parser = argparse.ArgumentParser(description="Commandline tool to download Defold's Bob")
@@ -126,12 +127,12 @@ def _cli_options():
 
 def _run_cli():
     options = _cli_options()
-    download(options.version, options.output, options.version)
+    download(options.version, options.output, options.version, option.force)
 
 
 def main():
     try:
-        run()
+        _run_cli()
     except KeyboardInterrupt:
         sys.exit()
     except:
