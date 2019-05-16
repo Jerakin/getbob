@@ -6,7 +6,7 @@ import argparse
 from html.parser import HTMLParser
 
 stable_url = "http://d.defold.com/stable/"
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 def log(string, verbose=False):
     if verbose:
@@ -84,7 +84,7 @@ def _download(sha, output, verbose=False, overwrite=False):
     if overwrite and os.path.exists(output):
         log("Overwriting file: {}".format(output), verbose)
         os.remove(output)
-    elif not overwrite:
+    elif not overwrite and os.path.exists(output):
         log("Bob already downloaded: {}".format(output), verbose)
         return False
 
