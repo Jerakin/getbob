@@ -6,7 +6,7 @@ import argparse
 from html.parser import HTMLParser
 
 stable_url = "http://d.defold.com/stable/"
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 def log(string, verbose=False):
     if verbose:
@@ -127,7 +127,7 @@ def _cli_options():
 
 def _run_cli():
     options = _cli_options()
-    download(options.version, options.output, options.version, option.force)
+    download(options.version, options.output, options.version, options.force)
 
 
 def main():
