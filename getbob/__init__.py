@@ -37,7 +37,7 @@ def _get_version_map(url=stable_url, verbose=False):
         parser.feed(str(response.content))
         return parser.version_data
     else:
-        log("Couldn't fetch version map HTML code: {}".format(response.status_code), verbose)
+        log("ERROR: Couldn't fetch version map HTML code: {}".format(response.status_code), verbose)
         return {}
 
 
@@ -55,21 +55,22 @@ def download(version, output, verbose=False, overwrite=False):
     sha = version
 
     if not output:
-        print("Output file required")
+        print("ERROR: Output file required\n")
+        return False
     elif not version:
         sha, version = _get_latest_beta_sha()
-        log("Getting latest stable version: {}".format(version), verbose)
+        log("INFO: Getting latest stable version: {}".format(version), verbose)
 
     elif len(version.split(".")) == 3:
         version_map = _get_version_map()
         try:
             sha = version_map[version]
         except KeyError:
-            print("Can't find version {} of bob, supply valid version".format(version))
+            print("ERROR: Can't find version {} of bob, supply valid version\n".format(version))
             return False
     elif version == "beta":
         sha, version = _get_latest_beta_sha()
-        log("Getting latest beta version: {}".format(version), verbose)
+        log("INFO: Getting latest beta version: {}".format(version), verbose)
 
     return _download(sha, output, verbose, overwrite)
 
@@ -77,15 +78,15 @@ def download(version, output, verbose=False, overwrite=False):
 def _download(sha, output, verbose=False, overwrite=False):
     bob_url = "http://d.defold.com/archive/{}/bob/bob.jar".format(sha)
     if requests.head(bob_url).status_code > 400:
-        log("Can't find version {} of bob, supply valid version".format(sha), verbose)
-        sys.exit(1)
+        print("ERROR: Can't find version {} of bob, supply valid version\n".format(sha), verbose)
+        return False
 
     target_folder = os.path.dirname(output)
     if overwrite and os.path.exists(output):
-        log("Overwriting file: {}".format(output), verbose)
+        log("INFO: Overwriting file: {}".format(output), verbose)
         os.remove(output)
     elif not overwrite and os.path.exists(output):
-        log("Bob already downloaded: {}".format(output), verbose)
+        log("INFO: Bob already downloaded: {}".format(output), verbose)
         return False
 
     if not os.path.exists(target_folder):
@@ -94,7 +95,7 @@ def _download(sha, output, verbose=False, overwrite=False):
 
     r = requests.get(bob_url, stream=True)
     with open(output, "wb") as f:
-        log("Downloading new bob: {}".format(sha), verbose)
+        log("INFO: Downloading new bob: {}".format(sha), verbose)
         total_size = int(r.headers.get('content-length', 0))
         if total_size:
             dl = 0
@@ -109,7 +110,7 @@ def _download(sha, output, verbose=False, overwrite=False):
             sys.stdout.write("\n")
         else:
             f.write(r.content)
-        log("Download completed", verbose)
+        log("INFO: Download completed", verbose)
     return True
 
 def _cli_options():
