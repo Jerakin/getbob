@@ -6,7 +6,8 @@ import argparse
 from html.parser import HTMLParser
 
 stable_url = "http://d.defold.com/stable/"
-__version__ = "1.0.3"
+__version__ = "1.1.0"
+
 
 def log(string, verbose=False):
     if verbose:
@@ -59,7 +60,7 @@ def _get_latest_stable():
     return info["sha1"], info["version"]
 
 
-def download(version, output, verbose=False, overwrite=False):
+def download(version, output, verbose=False, overwrite=False, progress=False):
     sha = version
 
     if not output:
@@ -80,10 +81,10 @@ def download(version, output, verbose=False, overwrite=False):
         sha, version = _get_latest_beta_sha()
         log("INFO: Getting latest beta version: {}".format(version), verbose)
 
-    return _download(sha, output, verbose, overwrite)
+    return _download(sha, output, verbose, overwrite, progress)
 
 
-def _download(sha, output, verbose=False, overwrite=False):
+def _download(sha, output, verbose=False, overwrite=False, progress=False):
     bob_url = "http://d.defold.com/archive/{}/bob/bob.jar".format(sha)
     if requests.head(bob_url).status_code > 400:
         print("ERROR: Can't find version {} of bob, supply valid version\n".format(sha), verbose)
@@ -111,11 +112,13 @@ def _download(sha, output, verbose=False, overwrite=False):
                 dl += len(data)
                 f.write(data)
 
-                # Progressbar
-                done = int(50 * dl / total_size)
-                sys.stdout.write("\r[%s%s]" % ('=' * done, ' ' * (50 - done)))
-                sys.stdout.flush()
-            sys.stdout.write("\n")
+                if progress:
+                    # Progressbar
+                    done = int(50 * dl / total_size)
+                    sys.stdout.write("\r[%s%s]" % ('=' * done, ' ' * (50 - done)))
+                    sys.stdout.flush()
+            if progress:
+                sys.stdout.write("\n")
         else:
             f.write(r.content)
         log("INFO: Download completed", verbose)
@@ -128,9 +131,10 @@ def _cli_options():
     required = parser.add_argument_group("required arguments")
     required.add_argument('-o, ''--output', dest='output', help="File name of the output")
     optional.add_argument('-v', '--version', dest='version', nargs="?",
-                        help="Which version to download, if not provided the latest stable will be used. "
-                             "Either: sha1 string, version string (1.2.152) or 'beta'")
+                          help="Which version to download, if not provided the latest stable will be used. "
+                          "Either: sha1 string, version string (1.2.152) or 'beta'")
     optional.add_argument('-f', '--force', action='store_true', dest="force", help="Overwrite already downloaded bob")
+    optional.add_argument('-np', '--no-progress', action='store_true', dest='no_progress', help="Print verbose output")
     optional.add_argument('--verbose', action='store_true', dest='verbose', help="Print verbose output")
     parser._action_groups.append(optional)
 
@@ -140,7 +144,7 @@ def _cli_options():
 def _run_cli():
     parser = _cli_options()
     options = parser.parse_args()
-    if not download(options.version, options.output, options.version, options.force):
+    if not download(options.version, options.output, options.version, options.force, not options.no_progress):
         parser.print_help()
 
 
