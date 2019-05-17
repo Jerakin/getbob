@@ -13,8 +13,16 @@ def log(string, verbose=False):
         print(string)
 
 
+class MyParser(argparse.ArgumentParser):
+    def error(self, message):
+        sys.stdout.write('Error: {}'.format(message))
+        self.print_help()
+        sys.exit(2)
+
+
 class MyHTMLParser(HTMLParser):
     version_data = {}
+
     def handle_starttag(self, tag, attrs):
         pass
 
@@ -113,22 +121,27 @@ def _download(sha, output, verbose=False, overwrite=False):
         log("INFO: Download completed", verbose)
     return True
 
+
 def _cli_options():
-    parser = argparse.ArgumentParser(description="Commandline tool to download Defold's Bob")
-    parser.add_argument('--output', dest='output', help="File name of the output, required")
-    parser.add_argument('--version', dest='version', nargs="?",
+    parser = MyParser(description="Commandline tool to download Defold's Bob")
+    optional = parser._action_groups.pop()
+    required = parser.add_argument_group("required arguments")
+    required.add_argument('-o, ''--output', dest='output', help="File name of the output")
+    optional.add_argument('-v', '--version', dest='version', nargs="?",
                         help="Which version to download, if not provided the latest stable will be used. "
                              "Either: sha1 string, version string (1.2.152) or 'beta'")
-    parser.add_argument('--force', action='store_true', dest="force", help="Overwrite already downloaded bob")
-    parser.add_argument('--verbose', action='store_true', dest='verbose', help="Print verbose output")
-    input_args = parser.parse_args()
+    optional.add_argument('-f', '--force', action='store_true', dest="force", help="Overwrite already downloaded bob")
+    optional.add_argument('--verbose', action='store_true', dest='verbose', help="Print verbose output")
+    parser._action_groups.append(optional)
 
-    return input_args
+    return parser
 
 
 def _run_cli():
-    options = _cli_options()
-    download(options.version, options.output, options.version, options.force)
+    parser = _cli_options()
+    options = parser.parse_args()
+    if not download(options.version, options.output, options.version, options.force):
+        parser.print_help()
 
 
 def main():
