@@ -6,7 +6,7 @@ import argparse
 from html.parser import HTMLParser
 
 stable_url = "http://d.defold.com/stable/"
-__version__ = "1.1.0"
+__version__ = "2.0.0"
 
 
 def log(string, verbose=False):
@@ -129,13 +129,14 @@ def _cli_options():
     parser = MyParser(description="Commandline tool to download Defold's Bob")
     optional = parser._action_groups.pop()
     required = parser.add_argument_group("required arguments")
-    required.add_argument('-o, ''--output', dest='output', help="File name of the output")
-    optional.add_argument('-v', '--version', dest='version', nargs="?",
+    required.add_argument('-o', '--output', dest='output', help="File name of the output")
+    optional.add_argument('-d', '--defold', dest='defold', nargs="?",
                           help="Which version to download, if not provided the latest stable will be used. "
                           "Either: sha1 string, version string (1.2.152) or 'beta'")
     optional.add_argument('-f', '--force', action='store_true', dest="force", help="Overwrite already downloaded bob")
     optional.add_argument('-np', '--no-progress', action='store_true', dest='no_progress', help="Print verbose output")
     optional.add_argument('--verbose', action='store_true', dest='verbose', help="Print verbose output")
+    optional.add_argument('--version', action='version', version="getbob {}".format(__version__), help="Print getbob's version")
     parser._action_groups.append(optional)
 
     return parser
@@ -144,7 +145,7 @@ def _cli_options():
 def _run_cli():
     parser = _cli_options()
     options = parser.parse_args()
-    if not download(options.version, options.output, options.version, options.force, not options.no_progress):
+    if not download(options.defold, options.output, options.verbose, options.force, not options.no_progress):
         parser.print_help()
 
 
