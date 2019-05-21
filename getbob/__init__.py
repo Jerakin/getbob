@@ -6,7 +6,7 @@ import argparse
 from html.parser import HTMLParser
 
 stable_url = "http://d.defold.com/stable/"
-__version__ = "2.0.0"
+__version__ = "2.0.1"
 
 
 def log(string, verbose=False):
