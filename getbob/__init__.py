@@ -96,7 +96,7 @@ def _download(sha, output, verbose=False, overwrite=False, progress=False):
         os.remove(output)
     elif not overwrite and os.path.exists(output):
         log("INFO: Bob already downloaded: {}".format(output), verbose)
-        return False
+        sys.exit(1)
 
     if not os.path.exists(target_folder):
         log("Creating directories: {}".format(target_folder), verbose)
