@@ -90,7 +90,8 @@ def _download(sha, output, verbose=False, overwrite=False, progress=False):
         print("ERROR: Can't find version {} of bob, supply valid version\n".format(sha), verbose)
         return False
 
-    target_folder = os.path.dirname(output)
+    target_folder = os.path.dirname(os.path.realpath(output))
+    log("INFO: Downloading to: {}".format(target_folder))
     if overwrite and os.path.exists(output):
         log("INFO: Overwriting file: {}".format(output), verbose)
         os.remove(output)
@@ -99,7 +100,7 @@ def _download(sha, output, verbose=False, overwrite=False, progress=False):
         sys.exit(1)
 
     if not os.path.exists(target_folder):
-        log("Creating directories: {}".format(target_folder), verbose)
+        log("INFO: Creating directories: {}".format(target_folder), verbose)
         os.makedirs(target_folder, exist_ok=True)
 
     r = requests.get(bob_url, stream=True)
