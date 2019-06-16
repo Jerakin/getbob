@@ -7,7 +7,6 @@ Download
 ********
 Install with ``pip install getbob``
 
-Can also be used as a python module
 
 *****
 Usage
@@ -30,3 +29,18 @@ Usage
                             string (1.2.152) or 'beta'
       -f, --force           Overwrite already downloaded bob
       --verbose             Print verbose output
+
+
+Integrates well with build systems such as Jenkins, you can set a string argument that you can use to specify which defold version to use.
+
+Here's an example of how I use it on Jenkins
+.. code-block:: bash
+    export bob="$WORKSPACE/../bob/$defold.jar"
+
+    # Get bob
+    getbob --output $bob --defold $defold --no-progress
+
+
+Can also be used to simply download a version of bob quickly to
+
+`getbob --output bob.jar`
