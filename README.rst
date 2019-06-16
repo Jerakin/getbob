@@ -13,6 +13,7 @@ Usage
 *****
 
 .. code-block:: bash
+
     $ getbob --help
     usage: getbob [-h] [-o, --output OUTPUT] [-v [VERSION]] [-f] [--verbose]
 
@@ -34,13 +35,15 @@ Usage
 Integrates well with build systems such as Jenkins, you can set a string argument that you can use to specify which defold version to use.
 
 Here's an example of how I use it on Jenkins
+
 .. code-block:: bash
+
     export bob="$WORKSPACE/../bob/$defold.jar"
 
     # Get bob
     getbob --output $bob --defold $defold --no-progress
 
 
-Can also be used to simply download a version of bob quickly to
+Can also be used to simply download a version of bob quickly to :code:`getbob --output bob.jar`
 
-`getbob --output bob.jar`
+Can also be used in a python script like :code:`import getbob; getbob.download("1.2.155", "/output/path")`
