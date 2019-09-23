@@ -6,7 +6,7 @@ import argparse
 from html.parser import HTMLParser
 
 stable_url = "http://d.defold.com/stable/"
-__version__ = "2.0.2"
+__version__ = "2.0.3"
 
 
 def log(string, verbose=False):
@@ -138,6 +138,7 @@ def _cli_options():
     optional.add_argument('-np', '--no-progress', action='store_true', dest='no_progress', help="Print verbose output")
     optional.add_argument('--verbose', action='store_true', dest='verbose', help="Print verbose output")
     optional.add_argument('--version', action='version', version="getbob {}".format(__version__), help="Print getbob's version")
+    optional.add_argument('v', nargs='?', help='Version to download')
     parser._action_groups.append(optional)
 
     return parser
@@ -146,8 +147,12 @@ def _cli_options():
 def _run_cli():
     parser = _cli_options()
     options = parser.parse_args()
-    if not download(options.defold, options.output, options.verbose, options.force, not options.no_progress):
-        parser.print_help()
+    if not any([options.output, options.defold]):
+        if not download(options.v, os.path.join(os.path.curdir, "bob_{}.jar".format(options.v)), options.verbose, options.force, not options.no_progress):
+            parser.print_help()
+    else:
+        if not download(options.defold, options.output, options.verbose, options.force, not options.no_progress):
+            parser.print_help()
 
 
 def main():
