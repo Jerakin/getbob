@@ -44,6 +44,7 @@ Here's an example of how I use it on Jenkins
     getbob --output $bob --defold $defold --no-progress
 
 
-Can also be used to simply download a version of bob quickly to :code:`getbob --output bob.jar`
+Can also be used to simply download a version of bob quickly too
+To download the most recent version to pwd as "bob.jar" :code:`getbob --output bob.jar`
 
 Can also be used in a python script like :code:`import getbob; getbob.download("1.2.155", "/output/path")`
