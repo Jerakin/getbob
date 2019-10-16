@@ -6,7 +6,7 @@ import argparse
 from html.parser import HTMLParser
 
 stable_url = "http://d.defold.com/stable/"
-__version__ = "2.0.3"
+__version__ = "2.0.4"
 
 
 def log(string, verbose=False):
@@ -97,7 +97,7 @@ def _download(sha, output, verbose=False, overwrite=False, progress=False):
         os.remove(output)
     elif not overwrite and os.path.exists(output):
         log("INFO: Bob already downloaded: {}".format(output), verbose)
-        sys.exit(1)
+        return True
 
     if not os.path.exists(target_folder):
         log("INFO: Creating directories: {}".format(target_folder), verbose)
